@@ -38,42 +38,60 @@ namespace RosinInstall
 
             if (fiddlerInstallDir != "")
             {
-                currentDir += @"\Scripts";
-                string scriptDir = fiddlerInstallDir + @"\Scripts";
-
-                string[] fileList = { "Rosin.dll", "Newtonsoft.Json.v6.0.dll" };
-                string[] dirList = { "Rosin" };
-
-                string[] fileNoOverwriteList = { "InjectionList.xml", "InjectionRule.xml" };
-
-                foreach (string fileName in fileList)
-                {
-                    string sourceFile = System.IO.Path.Combine(currentDir, fileName);
-                    string destFile = System.IO.Path.Combine(scriptDir, fileName);
-                    if (System.IO.File.Exists(sourceFile))
-                    {
-                        try
-                        {
-                            System.IO.File.Copy(sourceFile, destFile, true);
-                        }
-                        catch
-                        {
-                            throw new Exception("安装失败，请关闭Fiddler后再安装!");
-                        }
-                    }
-                }
-
-                foreach (string dirName in dirList)
-                {
-                    string sourceDir = System.IO.Path.Combine(currentDir, dirName);
-                    string destDir = System.IO.Path.Combine(scriptDir, dirName);
-                    this.CopyDirectory(sourceDir, destDir, fileNoOverwriteList);
-                }
-
+                this.CopyRosin(currentDir, fiddlerInstallDir);
+                this.CopyJsonViewer(currentDir, fiddlerInstallDir);
+   
                 isInstallSuccess = true;
             }
 
             return isInstallSuccess;
+        }
+
+        // rosin 插件安装拷贝文件 
+        private void CopyRosin(string currentDir, string fiddlerInstallDir)
+        {
+            currentDir += @"\Scripts";
+            string scriptDir = fiddlerInstallDir + @"\Scripts";
+
+            string[] fileList = { "Rosin.dll", "Newtonsoft.Json.v6.0.dll" };
+            string[] dirList = { "Rosin" };
+
+            string[] fileNoOverwriteList = { "InjectionList.xml", "InjectionRule.xml" }; // 不覆盖文件列表
+
+            foreach (string fileName in fileList)
+            {
+                string sourceFile = System.IO.Path.Combine(currentDir, fileName);
+                string destFile = System.IO.Path.Combine(scriptDir, fileName);
+                if (System.IO.File.Exists(sourceFile))
+                {
+                    try
+                    {
+                        System.IO.File.Copy(sourceFile, destFile, true);
+                    }
+                    catch
+                    {
+                        throw new Exception("安装失败，请关闭Fiddler后再安装!");
+                    }
+                }
+            }
+
+            foreach (string dirName in dirList)
+            {
+                string sourceDir = System.IO.Path.Combine(currentDir, dirName);
+                string destDir = System.IO.Path.Combine(scriptDir, dirName);
+                this.CopyDirectory(sourceDir, destDir, fileNoOverwriteList);
+            }
+        }
+
+        // json viewer 安装拷贝文件
+        private void CopyJsonViewer(string currentDir, string fiddlerInstallDir)
+        {
+            currentDir += @"\Inspectors";
+            string inspectorsDir = fiddlerInstallDir + @"\Inspectors";
+
+            string[] fileNoOverwriteList = { "JsonViewer.dll", "JsonViewer.dll.config", "Newtonsoft.Json.Net20.dll" }; // 不覆盖文件列表
+
+            this.CopyDirectory(currentDir, inspectorsDir, fileNoOverwriteList);
         }
 
         private void CopyDirectory(string srcDir, string tgtDir, string[] fileNoOverwriteList)
